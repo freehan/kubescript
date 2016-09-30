@@ -1,0 +1,38 @@
+#!/usr/bin/python
+
+import util
+import argparse
+import os
+
+gopath = os.environ['GOPATH']
+kubelet_bin_path = os.path.join(gopath, 'src/k8s.io/kubernetes/_output/bin/kubelet')
+if not os.path.isfile(kubelet_bin_path):
+    print("Cannot find kubelet binary in %s" % kubelet_bin_path)
+else:
+    util.exec_cmd(["ls", "-al", kubelet_bin_path])
+
+parser = argparse.ArgumentParser(description='kubectl exec in one of the ')
+parser.add_argument('host', metavar='host', type=str, nargs="?",
+                    help='host to gssh')
+
+args = parser.parse_args()
+host = args.host
+zone = 'us-central1-b'
+
+if host == None:
+    instances = util.get_all_gce_instances()
+    i = input("Enter an instance index: ")
+    host = instances[i].name
+    zone = instances[i].zone
+
+util.gcloud_compute_copy_file_to_host(host, kubelet_bin_path)
+
+cmd = """sudo bash -c '
+(service kubelet status > /dev/null && service kubelet stop) || (systemctl status kubelet > /dev/null && systemctl stop kubelet)
+rm /home/kubernetes/bin/kubelet
+mv ./kubelet /home/kubernetes/bin/kubelet
+sleep 5
+service kubelet start || (systemctl start kubelet && echo startup)
+'
+"""
+util.gcloud_compute_ssh_command(zone, host, cmd)
