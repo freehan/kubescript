@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+from util import *
+import argparse
+import os
+import datetime
+
+KUBE_PROXY_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
+KUBE_PROXY_IMAGE_TAR_PATH = "/tmp/kube-proxy.tar"
+KUBE_PROXY_BIN_NAME = "kube-proxy"
+
+kubeproxy_bin_path = search_binary_in_k8s_output_path('kube-proxy')
+
+parser = argparse.ArgumentParser(description='kubectl exec in one of the ')
+parser.add_argument("--skip-build", dest='build', action='store_false',
+                    help='build kube-proxy image')
+parser.add_argument('host', metavar='host', type=str, nargs="?",
+                    help='host to gssh')
+parser.set_defaults(build=True)
+
+args = parser.parse_args()
+host = args.host
+zone = 'us-central1-b'
+
+if args.build:
+    print "============= Build kube-proxy image tarball ================"
+    tag = "mykubeproxy:" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+    build_kube_image(KUBE_PROXY_BASE_IMAGE, kubeproxy_bin_path, KUBE_PROXY_BIN_NAME, tag=tag)
+    build_kube_image_tarball(tag, output_path=KUBE_PROXY_IMAGE_TAR_PATH)
+    docker_rmi(tag)
+
+if host == None:
+    instances = get_all_gce_instances()
+    i = input("Enter an instance index: ")
+    host = instances[i].name
+    zone = instances[i].zone
+
+print "============= Push new kube-proxy ================"
+gcloud_compute_copy_file_to_host(host, KUBE_PROXY_IMAGE_TAR_PATH)
+
+cmd = """sudo bash -c '
+docker load < kube-proxy.tar
+ls -al ~/kube-proxy.manifest > /dev/null 2>&1 || cp /etc/kubernetes/manifests/kube-proxy.manifest ~/kube-proxy.manifest
+sed -i "s/image:.*/image: {}/" /etc/kubernetes/manifests/kube-proxy.manifest
+'
+"""
+gcloud_compute_ssh_command(zone, host, cmd.format(tag))
