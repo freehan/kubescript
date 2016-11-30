@@ -26,6 +26,8 @@ if args.build:
     build_kube_image(KUBE_PROXY_BASE_IMAGE, kubeproxy_bin_path, KUBE_PROXY_BIN_NAME, tag=tag)
     build_kube_image_tarball(tag, output_path=KUBE_PROXY_IMAGE_TAR_PATH)
     docker_rmi(tag)
+else:
+    tag = retrieve_image_tag(KUBE_PROXY_IMAGE_TAR_PATH)
 
 instance = get_target_gce_instance(args.host)
 

@@ -133,10 +133,21 @@ def docker_rmi(tag):
     exec_cmd(["docker", "rmi", tag])
 
 
-def build_kube_image_tarball(tag, output_path="/tmp/mydockerfile/out.tar"):
+def build_kube_image_tarball(tag, output_path="/tmp/out.tar"):
     f = open(output_path, 'w+')
     subprocess.call(["docker", "save", tag], stdout=f)
     f.close()
+    print "Saved %s image at %s" % (tag, output_path)
+    # save tag
+    f = open(output_path + ".tag", 'w+')
+    f.write(tag)
+    f.close()
+
+def retrieve_image_tag(output_path):
+    f = open(output_path + ".tag", "r")
+    tag = f.read().replace('\n', '')
+    f.close()
+    return tag
 
 def search_binary_in_k8s_output_path(binary):
     gopath = os.environ['GOPATH']
