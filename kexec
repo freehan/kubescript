@@ -3,7 +3,7 @@
 import argparse
 import util
 
-parser = argparse.ArgumentParser(description='kubectl exec in one of the selected pods')
+parser = argparse.ArgumentParser(description='kubectl exec in one of the pods that match prefix')
 parser.add_argument('pod_prefix', metavar='pod prefix', type=str, nargs=1,
                     help='prefix of pod')
 parser.add_argument('command', metavar='Command', type=str, nargs="+",

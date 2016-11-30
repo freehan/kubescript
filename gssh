@@ -8,13 +8,7 @@ parser.add_argument('host', metavar='host', type=str, nargs="?",
                     help='host to gssh')
 
 args = parser.parse_args()
-host = args.host
-zone = 'us-central1-b'
 
-if host == None:
-    instances = get_all_gce_instances()
-    i = input("Enter an instance index: ")
-    host = instances[i].name
-    zone = instances[i].zone
+instance = get_target_gce_instance(args.host)
 
-gcloud_compute_ssh(zone, host)
+gcloud_compute_ssh(instance.zone, instance.name)

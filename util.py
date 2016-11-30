@@ -83,6 +83,20 @@ def get_all_gce_instances():
     return instances
 
 
+def get_target_gce_instance(host):
+    if host == None:
+        instances = get_all_gce_instances()
+        i = input("Enter an instance index: ")
+        instance = instances[i]
+    else:
+        # only return instance name and
+        # assume the instance is at us-central1-b
+        instance = GCEInstance()
+        instance.name = host
+        instance.zone = 'us-central1-b'
+    return instance
+
+
 def gcloud_compute_ssh(zone, host):
     exec_cmd(GCLOUD_SSH + [zone, host])
 
