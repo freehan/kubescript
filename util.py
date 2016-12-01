@@ -9,7 +9,7 @@ GET_ALL_GCE_INSTANCES = ["gcloud", "compute", "instances", "list"]
 GCLOUD_SSH = ["gcloud", "compute", "ssh", "--zone"]
 GCLOUD_COPY_FILE = ["gcloud", "compute", "copy-files"]
 KUBE_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
-TMP_DOCKER_BUILD_PATH = "~/Desktop/tmp/mydockerbuild/"
+TMP_DOCKER_BUILD_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "build")
 DOCKERFILE = "Dockerfile"
 TMP_DOCKER_FILE_PATH = os.path.join(TMP_DOCKER_BUILD_PATH, DOCKERFILE)
 
@@ -114,10 +114,40 @@ def exec_cmd(cmd):
     subprocess.call(cmd)
 
 
+# assumes input command returns a table
+def get_cmd_result_as_table(cmd):
+    table = []
+    output = subprocess.check_output(cmd, shell=True)
+    lines = output.splitlines()
+    for line in lines:
+        table.append(line.split())
+    return table
+
+
+def convert_table_into_html(cmd, table):
+    html = """
+<div class="table-responsive col-md-6">
+    <h4><b>{}</b></h4>
+    <table class=\"table table-striped table-bordered table-hover table-condensed\">
+        <tbody>
+            {}
+        </tbody>
+    </table>
+</div>
+    """
+    html_table = ""
+    for line in table:
+        html_table += "<tr>\n"
+        items = ["<td>" + item + "</td>" for item in line]
+        html_table += "\n".join(items)
+        html_table += "</tr>\n"
+    return html.format(cmd, html_table)
+
+
 def build_kube_image(baseimage, binary_path, binary_name, tag="mykubetag"):
-    if os.path.exists(os.path.dirname(TMP_DOCKER_BUILD_PATH)):
+    if os.path.exists(TMP_DOCKER_BUILD_PATH):
         shutil.rmtree(TMP_DOCKER_BUILD_PATH)
-    os.makedirs(os.path.dirname(TMP_DOCKER_BUILD_PATH))
+    os.makedirs(TMP_DOCKER_BUILD_PATH)
 
     simlink_path = os.path.join(TMP_DOCKER_BUILD_PATH, binary_name)
     exec_cmd(["ln", binary_path, simlink_path])
@@ -127,7 +157,7 @@ def build_kube_image(baseimage, binary_path, binary_name, tag="mykubetag"):
     f.write("ADD " + binary_name + " /usr/local/bin/" + binary_name + "\n")
     f.close()
     exec_cmd(["docker", "build", "-t", tag, TMP_DOCKER_BUILD_PATH])
-
+    shutil.rmtree(TMP_DOCKER_BUILD_PATH)
 
 def docker_rmi(tag):
     exec_cmd(["docker", "rmi", tag])
@@ -143,11 +173,13 @@ def build_kube_image_tarball(tag, output_path="/tmp/out.tar"):
     f.write(tag)
     f.close()
 
+
 def retrieve_image_tag(output_path):
     f = open(output_path + ".tag", "r")
     tag = f.read().replace('\n', '')
     f.close()
     return tag
+
 
 def search_binary_in_k8s_output_path(binary):
     gopath = os.environ['GOPATH']

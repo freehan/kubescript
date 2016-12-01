@@ -12,11 +12,11 @@ COMPONENTS = ["kube-apiserver", "kube-controller-manager", "kube-scheduler"]
 parser = argparse.ArgumentParser(description='push master component')
 parser.add_argument("--skip-build", dest='build', action='store_false',
                     help='build kube-proxy image')
-parser.add_argument('component', metavar='component', type=str, nargs=1,
+parser.add_argument('component', metavar='COMPONENT', type=str, nargs=1,
                     choices=COMPONENTS,
-                    help='Master component to push. Valid input includes: %s' % COMPONENTS)
+                    help='{ %s }' % " | ".join(COMPONENTS))
 parser.add_argument('host', metavar='host', type=str, nargs="?",
-                    help='host to gssh')
+                    help='target host to push')
 parser.set_defaults(build=True)
 
 args = parser.parse_args()

@@ -1,0 +1,51 @@
+#!/usr/bin/python
+# Usage
+# run godview and hit localhost:8000 in the browser
+
+from util import *
+import SimpleHTTPServer
+import SocketServer
+import time
+import threading
+import os
+
+PORT = 8000
+TODOs = [
+    "gcloud compute forwarding-rules list",
+    "gcloud compute firewall-rules list | grep k8s-fw",
+    "gcloud compute routes list",
+    "kubectl get nodes --show-all -o wide",
+    "kubectl get svc --all-namespaces --show-all  -o wide",
+    "kubectl get rc --all-namespaces --show-all  -o wide",
+    "kubectl get deployment --all-namespaces --show-all  -o wide",
+    "kubectl get pod --all-namespaces --show-all -o wide",
+]
+
+template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "index.template")
+
+Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+SocketServer.TCPServer.allow_reuse_address = True
+httpd = SocketServer.TCPServer(("", PORT), Handler)
+
+def update_page():
+    now = time.ctime()
+    template = open(template_path, "r")
+    page = template.read()
+    template.close()
+
+    content = ""
+    for cmd in TODOs:
+        content += convert_table_into_html(cmd, get_cmd_result_as_table(cmd))
+
+    f = open("index.html", "w+")
+    f.write(page.format(now, content))
+    f.close()
+    threading.Timer(5, update_page).start()
+
+
+try:
+    update_page()
+    print "Serving at port", PORT
+    httpd.serve_forever()
+except KeyboardInterrupt:
+    print '\nGoodbye!'

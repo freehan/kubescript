@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description='push kubeproxy')
 parser.add_argument("--skip-build", dest='build', action='store_false',
                     help='build kube-proxy image')
 parser.add_argument('host', metavar='host', type=str, nargs="?",
-                    help='host to gssh')
+                    help='target host to push')
 parser.set_defaults(build=True)
 
 args = parser.parse_args()
