@@ -11,15 +11,20 @@ import os
 
 PORT = 8000
 TODOs = [
-    "gcloud compute forwarding-rules list",
-    "gcloud compute firewall-rules list | grep k8s-fw",
-    "gcloud compute routes list",
     "kubectl get nodes --show-all -o wide",
     "kubectl get svc --all-namespaces --show-all  -o wide",
+    "kubectl get endpoints --all-namespaces --show-all  -o wide",
     "kubectl get rc --all-namespaces --show-all  -o wide",
     "kubectl get deployment --all-namespaces --show-all  -o wide",
+    "gcloud compute firewall-rules list | grep e2e",
+    "gcloud compute routes list",
+    "gcloud compute forwarding-rules list",
     "kubectl get pod --all-namespaces --show-all -o wide",
 ]
+
+if 'RUN' in os.environ:
+    TODOs = os.environ['RUN'] + TODOs
+
 
 template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "index.template")
 

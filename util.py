@@ -5,6 +5,8 @@ import datetime
 from pprint import pprint
 
 GET_ALL_PODS = ["kubectl", "get", "pods", "--all-namespaces", "-o", "wide", "--show-all"]
+GET_ALL_RESOURCE = "kubectl get {} --all-namespaces -o wide --show-all"
+KUBECTL_RESOURCE_OPERATION = "kubectl {} {} --namespace={} {} {}"
 GET_ALL_GCE_INSTANCES = ["gcloud", "compute", "instances", "list"]
 GCLOUD_SSH = ["gcloud", "compute", "ssh", "--zone"]
 GCLOUD_COPY_FILE = ["gcloud", "compute", "copy-files"]
@@ -43,8 +45,24 @@ class GCEInstance:
         return self.name + '\t' + self.zone + '\t' + self.internal_ip + '\t' + self.external_ip + '\t' + self.status
 
 
+def get_all_resource(resource):
+    return subprocess.check_output(GET_ALL_RESOURCE.format(resource), shell=True)
+
+
+def get_matched_objects(resource, prefix):
+    output = get_all_resource(resource)
+    lines = output.splitlines()
+    objects = [lines[0]]
+    for line in lines[1:]:
+        cols = line.split()
+        # assume 2nd column is name, 1st column is namespace
+        if cols[1].lstrip().startswith(prefix):
+            objects.append(line)
+    return objects
+
+
 def get_all_pods():
-    output = subprocess.check_output(GET_ALL_PODS)
+    output = get_all_resource("pods")
     pods = []
     for line in output.splitlines()[1:]:
         cols = line.split()
@@ -52,21 +70,20 @@ def get_all_pods():
     return pods
 
 
-def find_pod_with_prefix(pods, prefix):
-    for pod in pods:
-        if pod.name.startswith(prefix):
-            return pod
-    return None
-
-
 def find_all_pods_with_prefix(pods, prefix):
     ret = [p for p in pods if p.name.startswith(prefix)]
     return ret
 
 
+def run_kubectl(operation, resource, namespace, name, parameters):
+    cmd = KUBECTL_RESOURCE_OPERATION.format(operation, resource, namespace, name, ' '.join(parameters))
+    print "+ " + cmd
+    print subprocess.check_output(cmd, shell=True)
+
+
 def exec_in_pod(pod, commands):
     print("##### Exec in %s/%s" % (pod.namespace, pod.name))
-    exec_cmd(["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name] + commands)
+    exec_cmd(["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name, "--"] + commands)
 
 
 def get_all_gce_instances():
@@ -91,9 +108,7 @@ def get_target_gce_instance(host):
     else:
         # only return instance name and
         # assume the instance is at us-central1-b
-        instance = GCEInstance()
-        instance.name = host
-        instance.zone = 'us-central1-b'
+        instance = GCEInstance(host, 'us-central1-b', "", "", "")
     return instance
 
 

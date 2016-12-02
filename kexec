@@ -3,20 +3,27 @@
 import argparse
 import util
 
-parser = argparse.ArgumentParser(description='kubectl exec in one of the pods that match prefix')
-parser.add_argument('pod_prefix', metavar='pod prefix', type=str, nargs=1,
+parser = argparse.ArgumentParser(description='kubectl exec in pods that matches prefix')
+parser.add_argument("--all", dest='all', action='store_true',
+                    help='exec in all matched pods')
+parser.add_argument('pod_prefix', metavar='PodPrefix', type=str, nargs=1,
                     help='prefix of pod')
 parser.add_argument('command', metavar='Command', type=str, nargs="+",
                     help='command to execute')
+parser.set_defaults(all=False)
 
 args = parser.parse_args()
 pod_prefix = args.pod_prefix[0]
 
 pods = util.get_all_pods()
-pod = util.find_pod_with_prefix(pods, pod_prefix)
+matched_pods = util.find_all_pods_with_prefix(pods, pod_prefix)
 
-if pod == None:
+if len(matched_pods) <= 0:
     print("Could not find pod with prefix %s" % pod_prefix)
     exit(1)
 
-util.exec_in_pod(pod, args.command)
+if args.all:
+    for pod in matched_pods:
+        util.exec_in_pod(pod, args.command)
+else:
+    util.exec_in_pod(matched_pods[0], args.command)

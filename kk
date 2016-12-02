@@ -1,0 +1,35 @@
+#!/usr/bin/python
+
+import argparse
+from util import *
+
+parser = argparse.ArgumentParser(description='kubectl warpper to operate on one of the resource that match prefix across all namespaces. e.g. kk get pod kube -o yaml')
+parser.add_argument('operation', metavar='OPERATION', type=str, nargs=1,
+                    help='kubectl operation. e.g. get')
+parser.add_argument('resource', metavar='RESOURCE', type=str, nargs=1,
+                    help='k8s resource type. e.g. pod')
+parser.add_argument('prefix', metavar='PREFIX', type=str, nargs=1,
+                    help='prefix of resource to target')
+
+# unkonw arguments will be passed to kubectl
+args, unknown_args = parser.parse_known_args()
+resource = args.resource[0]
+prefix = args.prefix[0]
+operation = args.operation[0]
+
+matches = get_matched_objects(resource, prefix)
+
+if operation == 'get' and len(unknown_args) <= 0:
+    print '\n'.join(matches)
+    exit()
+
+if len(matches) <= 1:
+    print 'no match found'
+    exit()
+
+for obj in matches[1:]:
+    fields = obj.split()
+    run_kubectl(operation, resource, fields[0], fields[1], unknown_args)
+
+
+
