@@ -56,7 +56,7 @@ def get_matched_objects(resource, prefix):
     for line in lines[1:]:
         cols = line.split()
         # assume 2nd column is name, 1st column is namespace
-        if cols[1].lstrip().startswith(prefix):
+        if prefix == None or prefix == "" or cols[1].lstrip().startswith(prefix):
             objects.append(line)
     return objects
 
@@ -81,9 +81,13 @@ def run_kubectl(operation, resource, namespace, name, parameters):
     print subprocess.check_output(cmd, shell=True)
 
 
-def exec_in_pod(pod, commands):
+def exec_in_pod(pod, args):
     print("##### Exec in %s/%s" % (pod.namespace, pod.name))
-    exec_cmd(["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name, "--"] + commands)
+    if args[0] == '-c':
+        cmd = ["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name, args[0], args[1], "--"] + args[2:]
+    else:
+        cmd = ["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name, "--"] + args
+    exec_cmd(cmd)
 
 
 def get_all_gce_instances():
@@ -132,7 +136,16 @@ def exec_cmd(cmd):
 # assumes input command returns a table
 def get_cmd_result_as_table(cmd):
     table = []
-    output = subprocess.check_output(cmd, shell=True)
+    output = ""
+    try:
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+    except subprocess.CalledProcessError as exc:
+        output = "Failed to exec: " + cmd + "\n"
+        output += "ErrorCode: " + str(exc.returncode) + "\n"
+        output += "Output: " + exc.output + "\n"
+        print output
+        return [[output]]
+
     lines = output.splitlines()
     for line in lines:
         table.append(line.split())

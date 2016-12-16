@@ -8,11 +8,10 @@ parser.add_argument("--all", dest='all', action='store_true',
                     help='exec in all matched pods')
 parser.add_argument('pod_prefix', metavar='PodPrefix', type=str, nargs=1,
                     help='prefix of pod')
-parser.add_argument('command', metavar='Command', type=str, nargs="+",
-                    help='command to execute')
 parser.set_defaults(all=False)
 
-args = parser.parse_args()
+# unkonw arguments will be passed to kubectl
+args, unknown_args = parser.parse_known_args()
 pod_prefix = args.pod_prefix[0]
 
 pods = util.get_all_pods()
@@ -24,6 +23,6 @@ if len(matched_pods) <= 0:
 
 if args.all:
     for pod in matched_pods:
-        util.exec_in_pod(pod, args.command)
+        util.exec_in_pod(pod, unknown_args)
 else:
-    util.exec_in_pod(matched_pods[0], args.command)
+    util.exec_in_pod(matched_pods[0], unknown_args)

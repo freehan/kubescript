@@ -21,7 +21,7 @@ cmd = """sudo bash -c '
 rm /home/kubernetes/bin/kubelet || rm /usr/local/bin/kubelet
 mv ./kubelet /home/kubernetes/bin/kubelet || mv ./kubelet /usr/local/bin/kubelet
 sleep 5
-service kubelet start || (systemctl start kubelet && echo startup)
+service kubelet start || systemctl start kubelet && echo startup
 '
 """
 gcloud_compute_ssh_command(instance.zone, instance.name, cmd)
