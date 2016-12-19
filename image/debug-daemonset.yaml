@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: debug
+  labels:
+     name: debug
+spec:
+  template:
+    metadata:
+      name: debug-pod
+      labels:
+        app: debug
+    spec:
+      hostNetwork: true
+      containers:
+      - name: debug-container
+        image: freehandocker/debug
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        securityContext:
+          privileged: true
+
+

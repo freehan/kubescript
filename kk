@@ -3,7 +3,8 @@
 import argparse
 from util import *
 
-parser = argparse.ArgumentParser(description='kubectl warpper to operate on one of the resource that match prefix across all namespaces. e.g. kk get pod kube -o yaml')
+parser = argparse.ArgumentParser(
+    description='kubectl warpper to operate on one of the resource that match prefix across all namespaces. e.g. kk get pod kube -o yaml')
 parser.add_argument("--all", dest='all', action='store_true',
                     help='exec in all matched pods')
 parser.add_argument('operation', metavar='OPERATION', type=str, nargs=1,
@@ -24,17 +25,14 @@ matches = get_matched_objects(resource, prefix)
 
 if operation == 'get' and len(unknown_args) <= 0:
     print '\n'.join(matches)
-    exit()
+    exit(0)
 
-if len(matches) <= 1:
+if len(matches) <= 1 or prefix == "":
     print 'no match found'
-    exit()
+    exit(1)
 
 for obj in matches[1:]:
     fields = obj.split()
     run_kubectl(operation, resource, fields[0], fields[1], unknown_args)
     if not args.all:
         break
-
-
-

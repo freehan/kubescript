@@ -12,6 +12,9 @@ parser.set_defaults(all=False)
 
 # unkonw arguments will be passed to kubectl
 args, unknown_args = parser.parse_known_args()
+if len(unknown_args) <= 0:
+    print("Try to bash into pod by default")
+    unknown_args = ["bash"]
 pod_prefix = args.pod_prefix[0]
 
 pods = util.get_all_pods()
@@ -21,8 +24,10 @@ if len(matched_pods) <= 0:
     print("Could not find pod with prefix %s" % pod_prefix)
     exit(1)
 
-if args.all:
-    for pod in matched_pods:
-        util.exec_in_pod(pod, unknown_args)
-else:
-    util.exec_in_pod(matched_pods[0], unknown_args)
+for pod in matched_pods:
+    if not pod.status == "Running":
+        print("######Skipping pod %s since its status is %s" % (pod.name, pod.status))
+        continue
+    util.exec_in_pod(pod, unknown_args)
+    if not args.all:
+        break

@@ -6,7 +6,7 @@ import os
 import datetime
 
 BASE_IMAGE = "busybox"
-OUTPUT_PATH= "/tmp/my{}.tar"
+OUTPUT_PATH = "/tmp/my{}.tar"
 COMPONENTS = ["kube-apiserver", "kube-controller-manager", "kube-scheduler"]
 
 parser = argparse.ArgumentParser(description='push master component')
@@ -26,14 +26,13 @@ bin_path = search_binary_in_k8s_output_path(binary)
 tarball_path = OUTPUT_PATH.format(binary)
 
 if args.build:
-    print "============= Build kube-proxy image tarball ================"
+    print "============= Build %s image tarball ================" % binary
     tag = "my" + binary + ":" + datetime.datetime.now().strftime("%Y%m%d%H%M")
     build_kube_image(BASE_IMAGE, bin_path, binary, tag=tag)
     build_kube_image_tarball(tag, output_path=tarball_path)
     docker_rmi(tag)
 else:
     tag = retrieve_image_tag(tarball_path)
-
 
 print "===================Pushing %s ===================" % binary
 cmd = """sudo bash -c '
@@ -46,4 +45,3 @@ cmd = cmd.format(binary, binary, binary, binary, tag, binary)
 instance = get_target_gce_instance(args.host)
 gcloud_compute_copy_file_to_host(instance.name, tarball_path)
 gcloud_compute_ssh_command(instance.zone, instance.name, cmd)
-

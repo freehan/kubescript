@@ -187,6 +187,7 @@ def build_kube_image(baseimage, binary_path, binary_name, tag="mykubetag"):
     exec_cmd(["docker", "build", "-t", tag, TMP_DOCKER_BUILD_PATH])
     shutil.rmtree(TMP_DOCKER_BUILD_PATH)
 
+
 def docker_rmi(tag):
     exec_cmd(["docker", "rmi", tag])
 
