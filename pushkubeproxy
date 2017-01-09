@@ -9,8 +9,6 @@ KUBE_PROXY_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
 KUBE_PROXY_IMAGE_TAR_PATH = "/tmp/kube-proxy.tar"
 KUBE_PROXY_BIN_NAME = "kube-proxy"
 
-kubeproxy_bin_path = search_binary_in_k8s_output_path('kube-proxy')
-
 parser = argparse.ArgumentParser(description='push kubeproxy')
 parser.add_argument("--skip-build", dest='build', action='store_false',
                     help='build kube-proxy image')
@@ -19,6 +17,8 @@ parser.add_argument('host', metavar='host', type=str, nargs="?",
 parser.set_defaults(build=True)
 
 args = parser.parse_args()
+
+kubeproxy_bin_path = search_binary_in_k8s_output_path('kube-proxy')
 
 if args.build:
     print "============= Build kube-proxy image tarball ================"

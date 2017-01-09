@@ -4,13 +4,13 @@ from util import *
 import argparse
 import os
 
-kubelet_bin_path = search_binary_in_k8s_output_path('kubelet')
-
 parser = argparse.ArgumentParser(description='push kubelet')
 parser.add_argument('host', metavar='host', type=str, nargs="?",
                     help='target host to push')
 
 args = parser.parse_args()
+
+kubelet_bin_path = search_binary_in_k8s_output_path('kubelet')
 
 instance = get_target_gce_instance(args.host)
 

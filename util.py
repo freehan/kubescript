@@ -83,10 +83,17 @@ def run_kubectl(operation, resource, namespace, name, parameters):
 
 def exec_in_pod(pod, args):
     print("##### Exec in %s/%s" % (pod.namespace, pod.name))
-    if args[0] == '-c':
-        cmd = ["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name, args[0], args[1], "--"] + args[2:]
+    cmd = ["kubectl", "--namespace", pod.namespace, "exec"]
+    if len(args) <= 1 and ( args[0] == "bash" or args[0] == "sh"):
+        cmd.append("-it")
     else:
-        cmd = ["kubectl", "--namespace", pod.namespace, "exec", "-it", pod.name, "--"] + args
+        cmd.append("-t")
+    cmd.append(pod.name)
+    if args[0] == '-c':
+        cmd += [args[0], args[1], "--" + args[2:]]
+    else:
+        cmd.append("--")
+        cmd += args
     exec_cmd(cmd)
 
 
@@ -214,7 +221,7 @@ def search_binary_in_k8s_output_path(binary):
     gopath = os.environ['GOPATH']
     bin_path = os.path.join(gopath, 'src/k8s.io/kubernetes/_output/bin', binary)
     if not os.path.isfile(bin_path):
-        raise Exception("Cannot find %s binary in %s" % (binary, bin_path))
+        raise LookupError("Cannot find %s binary in %s" % (binary, bin_path))
     print "================Found %s Binary================" % binary
     exec_cmd(["ls", "-al", bin_path])
     return bin_path
