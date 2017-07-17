@@ -4,17 +4,17 @@ import shutil
 import datetime
 from pprint import pprint
 
-GET_ALL_PODS = ["kubectl", "get", "pods", "--all-namespaces", "-o", "wide", "--show-all"]
 GET_ALL_RESOURCE = "kubectl get {} --all-namespaces -o wide --show-all"
+GET_CURRENT_CONTEXT = "kubectl config current-context"
 KUBECTL_RESOURCE_OPERATION = "kubectl {} {} --namespace={} {} {}"
-GET_ALL_GCE_INSTANCES = ["gcloud", "compute", "instances", "list"]
+KUBECTL_CREATE = "kubectl create -f "
+GET_ALL_GCE_INSTANCES = "gcloud compute instances list"
 GCLOUD_SSH = ["gcloud", "compute", "ssh", "--zone"]
 GCLOUD_COPY_FILE = ["gcloud", "compute", "copy-files"]
 KUBE_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
 TMP_DOCKER_BUILD_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "build")
 DOCKERFILE = "Dockerfile"
 TMP_DOCKER_FILE_PATH = os.path.join(TMP_DOCKER_BUILD_PATH, DOCKERFILE)
-
 
 class Pod:
     def __init__(self):
@@ -97,8 +97,12 @@ def exec_in_pod(pod, args):
     exec_cmd(cmd)
 
 
+def get_kube_context():
+    return subprocess.check_output(GET_CURRENT_CONTEXT, shell=True)
+
+
 def get_all_gce_instances():
-    output = subprocess.check_output(GET_ALL_GCE_INSTANCES)
+    output = subprocess.check_output(GET_ALL_GCE_INSTANCES, shell=True)
     instances = []
     i = 0
     lines = output.splitlines()
@@ -225,3 +229,9 @@ def search_binary_in_k8s_output_path(binary):
     print "================Found %s Binary================" % binary
     exec_cmd(["ls", "-al", bin_path])
     return bin_path
+
+
+def ensure_tmp_path(path=os.path.join(os.path.dirname(os.path.realpath(__file__)), "tmp")):
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    return path

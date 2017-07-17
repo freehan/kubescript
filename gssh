@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-from util import *
+from util import get_target_gce_instance
+from util import gcloud_compute_ssh
 import argparse
 
 parser = argparse.ArgumentParser(description='gssh into one of the host')
