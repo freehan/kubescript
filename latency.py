@@ -1,3 +1,5 @@
+#!/usr/bin/python
+from pprint import pprint
 from datetime import datetime
 import re
 import subprocess
@@ -7,16 +9,16 @@ import argparse
 PROJECT = "TO BE FILLED"
 ZONE = "TO BE FILLED"
 NEG_NAME = "TO BE FILLED"
-BM_URL = "TO BE FILLED"
-SEARCH = "TO BE FILLED"
-
+BM_URL = 'TO BE FILLED'
+SEARCH = 'TO BE FILLED'
 VMs = {
-    "vm1": "1.2.3.5",
-    "vm2": "1.2.3.4",
+    "VM1": "IP1",
+    "VM2": "IP2"
 }
 
+
 NEG_ADD_DEL_FORMAT = 'curl -H "$(oauth2l header userinfo.email)" ' \
-                     'https://www.googleapis.com/compute/staging_beta/projects/{}/zones/{}/networkEndpointGroups/{}/{} ' \
+                     'https://www.googleapis.com/compute/beta/projects/{}/zones/{}/networkEndpointGroups/{}/{} ' \
                      '-H "Content-Type:application/json" -d \'{}\''
 
 ATTACH = "attachNetworkEndpoints"
@@ -26,29 +28,32 @@ parser = argparse.ArgumentParser(description='NEG API latency test')
 parser.add_argument('--expect-count', metavar='expect_count', type=int, default=10000)
 parser.add_argument('--port-start', metavar='port_start', type=int, default=10000)
 parser.add_argument('--port-per-vm', metavar='port_per_vm', type=int, default=1000)
+parser.add_argument('--vm-num', metavar='vm_num', type=int, default=-1)
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--attach', action='store_true')
 group.add_argument('--detach', action='store_true')
-parser.set_defaults(attach=True)
 args = parser.parse_args()
 
-OPERATION = ""
-if args.attach:
-    OPERATION = ATTACH
-else:
-    OPERATION = DETACH
 
+print args.attach
+print args.detach
+
+OPERATION = ""
+if args.detach:
+    OPERATION = DETACH
+else:
+    OPERATION = ATTACH
 EXPECT_COUNT = args.expect_count
 PORT_START = args.port_start
 PORT_NUM = args.port_per_vm
-
+VM_NUM = args.vm_num
 
 print "OPERATION =", OPERATION
 print "EXPECT_COUNT =", EXPECT_COUNT
 print "PORT_START =", PORT_START
 print "PORT_NUM =", PORT_NUM
+print "VM_NUM =", VM_NUM
 print "TOTAL_ENDPOINT =", len(VMs)*PORT_NUM
-# exit()
 
 def NEGCall(operation, body):
     return NEG_ADD_DEL_FORMAT.format(PROJECT, ZONE, NEG_NAME, operation, body)
@@ -58,7 +63,6 @@ def attachNE(body):
 
 def detachNE(body):
     return NEG_ADD_DEL_FORMAT.format(PROJECT, ZONE, NEG_NAME, DETACH, body)
-
 
 class NetworkEndpoint:
     def __init__(self, instance, ipAddress, port):
@@ -80,19 +84,23 @@ if __name__ == "__main__":
     print "START"
 
     endpointCount = 0
+    endpointList = []
+    curCount = 0
+    vmCount = 0
     for vm, ip in VMs.items():
-        count = 0
-        endpointList = []
+        vmCount += 1
+        if VM_NUM != -1 and vmCount > VM_NUM:
+            break
         for port in range(PORT_START, PORT_START + PORT_NUM):
             endpointList.append(json.dumps(NetworkEndpoint(vm, ip, port).__dict__))
             endpointCount += 1
-            count += 1
-            if count >= 500:
+            curCount += 1
+            if curCount >= 500:
                 negCalls.append(genBody(endpointList))
                 endpointList = []
-                count = 0
-        if len(endpointList) > 0:
-            negCalls.append(genBody(endpointList))
+                curCount = 0
+    if len(endpointList) > 0:
+        negCalls.append(genBody(endpointList))
 
     print "==========Number of calls=========:", len(negCalls)
     print "==========Number of Endpoints=========:", endpointCount
@@ -100,21 +108,21 @@ if __name__ == "__main__":
     t1 = datetime.now()
 
     for b in negCalls:
-        subprocess.Popen("echo start; sleep 2; echo yeah", stderr=subprocess.STDOUT, shell=True)
-        # subprocess.Popen(attachNE(b), stderr=subprocess.STDOUT, shell=True)
-        # subprocess.Popen(detachNE(b), stderr=subprocess.STDOUT, shell=True)
-        # subprocess.Popen(NEGCall(OPERATION, b), stderr=subprocess.STDOUT, shell=True)
+        subprocess.Popen(NEGCall(OPERATION, b), stderr=subprocess.STDOUT, shell=True)
 
     t2 = datetime.now()
     delta = t2 - t1
     combined1 = delta.seconds + delta.microseconds / 1E6
     while True:
         out = subprocess.check_output("gosso --url " + BM_URL, stderr=subprocess.STDOUT, shell=True)
+        #print out
         m = re.search(SEARCH, out)
+    #    print m.group(0)
+
         if m:
             found = m.group(1)
             print "Healthy endpoint count:" + found
-            if int(found) >= EXPECT_COUNT:
+            if int(found) == EXPECT_COUNT:
                 break
         else:
             print "no match"
@@ -123,6 +131,6 @@ if __name__ == "__main__":
     delta = t3 - t2
     combined2 = delta.seconds + delta.microseconds / 1E6
 
-    print "NEG API calls completed in: " + str(combined1)
+    print "NEG API calls issued in: " + str(combined1)
     print "Backend programmed in: " + str(combined2)
     print "END"
