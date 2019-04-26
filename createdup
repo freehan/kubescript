@@ -6,9 +6,9 @@ import argparse
 parser = argparse.ArgumentParser(description='create duplicate resources')
 parser.add_argument('file', metavar='file', type=str, nargs=1,
                     help='template file for creating duplicates')
-parser.add_argument('replicas', metavar='', type=int, nargs=1,
+parser.add_argument('replicas', metavar='replicas', type=int, nargs=1,
                     help='number of duplicates')
-parser.add_argument('interval', metavar='', type=int, nargs="?",
+parser.add_argument('interval', metavar='interval', type=int, nargs="?",
                     help='creation interval')
 args = parser.parse_args()
 

@@ -4,13 +4,13 @@ import shutil
 import datetime
 from pprint import pprint
 
-GET_ALL_RESOURCE = "kubectl get {} --all-namespaces -o wide --show-all"
+GET_ALL_RESOURCE = "kubectl get {} --all-namespaces -o wide"
 GET_CURRENT_CONTEXT = "kubectl config current-context"
 KUBECTL_RESOURCE_OPERATION = "kubectl {} {} --namespace={} {} {}"
 KUBECTL_CREATE = "kubectl create -f "
 GET_ALL_GCE_INSTANCES = "gcloud compute instances list"
 GCLOUD_SSH = ["gcloud", "compute", "ssh", "--zone"]
-GCLOUD_COPY_FILE = ["gcloud", "compute", "copy-files"]
+GCLOUD_COPY_FILE = ["gcloud", "compute", "scp"]
 KUBE_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
 TMP_DOCKER_BUILD_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "build")
 DOCKERFILE = "Dockerfile"
@@ -137,7 +137,6 @@ def gcloud_compute_ssh_command(zone, host, cmd):
 
 def gcloud_compute_copy_file_to_host(host, file):
     exec_cmd(GCLOUD_COPY_FILE + [file, host + ":"])
-
 
 def exec_cmd(cmd):
     print "+ " + ' '.join(cmd)

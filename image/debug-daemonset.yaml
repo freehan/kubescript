@@ -21,5 +21,8 @@ spec:
           hostPort: 80
         securityContext:
           privileged: true
+        resources:
+          requests:
+            cpu: 10m
 
 
