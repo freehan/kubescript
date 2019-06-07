@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: hostname
+  name: hostname
+spec:
+  selector:
+    matchLabels:
+      run: hostname
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: hostname
+      annotations:
+        templateCreationTime: "nil"
+    spec:
+      containers:
+      - image: gcr.io/kubernetes-e2e-test-images/serve-hostname:1.1
+        imagePullPolicy: IfNotPresent
+        name: hostname
+        resources:
+          requests:
+            cpu: 1m
+            memory: 0Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hostname
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 9376
+  selector:
+    run: hostname
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hostname
+spec:
+  backend:
+    serviceName: hostname
+    servicePort: 80
+
