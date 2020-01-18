@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  backend:
+    serviceName: foo-backend
+    servicePort: 80
+  rules:
+  - http:
+      paths:
+      - path: /foo
+        backend:
+          serviceName: foo-backend
+          servicePort: 80
+      - path: /bar
+        backend:
+          serviceName: bar-backend
+          servicePort: 80
+  - host: foo.com
+    http: 
+      paths:
+      - backend:
+          serviceName: foo-backend
+          servicePort: 80
+

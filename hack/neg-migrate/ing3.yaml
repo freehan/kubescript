@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  backend:
+    serviceName: foo-backend-neg
+    servicePort: 80
+  rules:
+  - http:
+      paths:
+      - path: /foo
+        backend:
+          serviceName: foo-backend-neg
+          servicePort: 80
+      - path: /foo/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa #path that is not possible to match
+        backend:
+          serviceName: foo-backend
+          servicePort: 80
+      - path: /bar
+        backend:
+          serviceName: bar-backend-neg
+          servicePort: 80
+      - path: /bar/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa #path that is not possible to match
+        backend:
+          serviceName: bar-backend
+          servicePort: 80
+  - host: foo.com
+    http: 
+      paths:
+      - path: /
+        backend:
+          serviceName: foo-backend-neg
+          servicePort: 80
+      - path: /aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        backend:
+          serviceName: foo-backend
+          servicePort: 80
+
