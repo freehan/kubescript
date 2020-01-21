@@ -1,22 +1,40 @@
-STEP 0: Initialize Non-NEG setup 
-
+## STEP 0: Initialize Non-NEG setup 
+```
 kubectl apply -f hostname.yaml
 kubectl apply -f ing1.yaml	
+```
 
+- Wait for sufficient time
+- Verify by sending requests and get continous 200 responses with no 500s.
+- Start sending traffic to `/foo` and `/bar` in order to hit different backends.
 
-STEP 1: Setup NEG backends
+## STEP 1: Setup NEG backends
+```
 kubectl apply -f hostname-neg.yaml
 kubectl apply -f ing2.yaml	
+```
 
-# validate NEGs & backend-services & URLmap
-# wait for sufficient time
+- Wait for sufficient time
+- Validate/Monitor the following setup:
+  - NEGs config and Endpoints in NEG: `gcloud compute network-endpoint-groups list-network-endpoints ${NETWORK_ENDPOINT_GROUP_NAME}`
+  - backend-services health status: `gcloud compute backend-services get-health ${BACKEND_SERVICE_NAME}`
+  - URLmap: `gcloud compute url-maps describe ${INGRESS_URL_MAP_NAME}`
+  - Traffic responses from `/foo` and `/bar`
 
-STEP 2: Swap NEG backends
+
+## STEP 2: Swap NEG backends
+```
 kubectl apply -f ing3.yaml	
+```
 
-# validate and wait for sufficient time
+- Wait for sufficient time
+- Validate setup
 
 
-STEP 3: Remove Non-NEG backends
+## STEP 3: Remove Non-NEG backends
+```
 kubectl apply -f ing4.yaml	
+```
 
+- Wait for sufficient time
+- Validate setup
