@@ -1,3 +1,7 @@
+## Introduction
+
+This folder contains a sample ingress setup on GCP. The following steps demonstrated a live seamless migration from classic non-NEG setup to a NEG setup. Please refer to the (official doc)[https://cloud.google.com/kubernetes-engine/docs/how-to/container-native-load-balancing] for more detail. 
+
 ## STEP 0: Initialize Non-NEG setup 
 ```
 kubectl apply -f hostname.yaml
