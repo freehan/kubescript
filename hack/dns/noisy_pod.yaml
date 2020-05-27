@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+        name: dnsclient
+spec:
+  containers:
+          #- image: ubuntu:16.04
+      - image: gcr.io/kubernetes-e2e-test-images/dnsutils:1.1
+        name: dnsclient
+        resources:
+                limits:
+                        cpu: "0.1"
+                requests:
+                        cpu: 100m
+        env:
+        - name: HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        command: ["sh", "-c"]
+        args: ["cat /etc/resolv.conf; while true; do out=`dig kubernetes.default.svc.cluster.local +short` && echo $out; if [[ -z \"$out\" ]]; then echo \"Query Complete, Failed\"; else echo \"Query Complete. Got Answer $out\"; fi; sleep 1; done"]

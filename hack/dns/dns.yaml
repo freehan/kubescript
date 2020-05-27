@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: debug
+  labels:
+     name: debug
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: debug
+    spec:
+      containers:
+      - name: debug-container
+        command:
+        - /bin/bash
+        - -c
+        - while true ; do date && dig kubernetes.default.svc.cluster.local && sleep 0.1 ; done
+        image: freehandocker/debug
+        ports:
+        - name: http
+          containerPort: 80
+        resources:
+          requests:
+            cpu: 500m
+
+
