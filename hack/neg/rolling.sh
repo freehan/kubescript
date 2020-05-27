@@ -15,6 +15,7 @@ metadata:
     run: hostname
   name: hostname
 spec:
+  replicas: 10
   selector:
     matchLabels:
       run: hostname

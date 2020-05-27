@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -6,6 +6,9 @@ metadata:
   name: foo-backend
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      run: foo-backend
   template:
     metadata:
       labels:
@@ -43,13 +46,16 @@ spec:
   type: NodePort
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     run: bar-backend
   name: bar-backend
 spec:
+  selector:
+    matchLabels:
+      run: bar-backend
   replicas: 3
   template:
     metadata:

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IP="tobeadd"
+IP=$1
 
 while :
 do
