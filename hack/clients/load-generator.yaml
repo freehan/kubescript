@@ -1,0 +1,36 @@
+# Need input to following values: ${num_request_per_batch} ${concurrent_connections} ${qps_per_client} ${VIP}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: load-generator
+  name: load-generator
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: load-generator
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: load-generator
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - for i in `seq 1 100`; do ./hey -n ${num_request_per_batch} -c ${concurrent_connections} -q ${qps_per_client}  http://${VIP};
+          done
+        image: freehandocker/hey:v1
+        imagePullPolicy: Always
+        name: load-generator
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: client-pod
+  name: client-pod
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: client-pod
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: client-pod
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - sleep 300
+        image: freehandocker/hey:v1
+        imagePullPolicy: Always
+        name: client-pod
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
