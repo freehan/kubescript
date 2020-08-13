@@ -25,7 +25,7 @@ spec:
       - command:
         - /bin/sh
         - -c
-        - sleep 300
+        - "while true; do sleep 10000; done"
         image: freehandocker/hey:v1
         imagePullPolicy: Always
         name: client-pod
