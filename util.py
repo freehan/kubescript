@@ -8,6 +8,7 @@ GET_ALL_RESOURCE = "kubectl get {} --all-namespaces -o wide"
 GET_CURRENT_CONTEXT = "kubectl config current-context"
 KUBECTL_RESOURCE_OPERATION = "kubectl {} {} --namespace={} {} {}"
 KUBECTL_CREATE = "kubectl create -f "
+KUBECTL_DELETE = "kubectl delete -f "
 GET_ALL_GCE_INSTANCES = "gcloud compute instances list"
 GCLOUD_SSH = ["gcloud", "compute", "ssh", "--zone"]
 GCLOUD_COPY_FILE = ["gcloud", "compute", "scp"]
