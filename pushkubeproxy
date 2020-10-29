@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-from util import *
 import argparse
-import os
 import datetime
+
+from util import *
 
 KUBE_PROXY_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
 KUBE_PROXY_IMAGE_TAR_PATH = "/tmp/kube-proxy.tar"
@@ -21,7 +21,8 @@ args = parser.parse_args()
 kubeproxy_bin_path = search_binary_in_k8s_output_path('kube-proxy')
 
 if args.build:
-    print "============= Build kube-proxy image tarball ================"
+    print
+    "============= Build kube-proxy image tarball ================"
     tag = "mykubeproxy:" + datetime.datetime.now().strftime("%Y%m%d%H%M")
     build_kube_image(KUBE_PROXY_BASE_IMAGE, kubeproxy_bin_path, KUBE_PROXY_BIN_NAME, tag=tag)
     build_kube_image_tarball(tag, output_path=KUBE_PROXY_IMAGE_TAR_PATH)
@@ -31,7 +32,8 @@ else:
 
 instance = get_target_gce_instance(args.host)
 
-print "============= Push new kube-proxy ================"
+print
+"============= Push new kube-proxy ================"
 gcloud_compute_copy_file_to_host(instance.name, KUBE_PROXY_IMAGE_TAR_PATH)
 
 cmd = """sudo bash -c '

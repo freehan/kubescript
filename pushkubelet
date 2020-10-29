@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-from util import *
 import argparse
+
+from util import *
 
 parser = argparse.ArgumentParser(description='push kubelet')
 parser.add_argument('host', metavar='host', type=str, nargs="?",

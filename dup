@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-from util import *
 import argparse
 import time
+
+from util import *
 
 parser = argparse.ArgumentParser(description='create duplicate resources')
 parser.add_argument('file', metavar='file', type=str, nargs=1,

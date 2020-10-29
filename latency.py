@@ -1,10 +1,9 @@
 #!/usr/bin/python
-from pprint import pprint
-from datetime import datetime
+import argparse
+import json
 import re
 import subprocess
-import json
-import argparse
+from datetime import datetime
 
 PROJECT = "TO BE FILLED"
 ZONE = "TO BE FILLED"
@@ -15,7 +14,6 @@ VMs = {
     "VM1": "IP1",
     "VM2": "IP2"
 }
-
 
 NEG_ADD_DEL_FORMAT = 'curl -H "$(oauth2l header userinfo.email)" ' \
                      'https://www.googleapis.com/compute/beta/projects/{}/zones/{}/networkEndpointGroups/{}/{} ' \
@@ -34,9 +32,10 @@ group.add_argument('--attach', action='store_true')
 group.add_argument('--detach', action='store_true')
 args = parser.parse_args()
 
-
-print args.attach
-print args.detach
+print
+args.attach
+print
+args.detach
 
 OPERATION = ""
 if args.detach:
@@ -48,21 +47,31 @@ PORT_START = args.port_start
 PORT_NUM = args.port_per_vm
 VM_NUM = args.vm_num
 
-print "OPERATION =", OPERATION
-print "EXPECT_COUNT =", EXPECT_COUNT
-print "PORT_START =", PORT_START
-print "PORT_NUM =", PORT_NUM
-print "VM_NUM =", VM_NUM
-print "TOTAL_ENDPOINT =", len(VMs)*PORT_NUM
+print
+"OPERATION =", OPERATION
+print
+"EXPECT_COUNT =", EXPECT_COUNT
+print
+"PORT_START =", PORT_START
+print
+"PORT_NUM =", PORT_NUM
+print
+"VM_NUM =", VM_NUM
+print
+"TOTAL_ENDPOINT =", len(VMs) * PORT_NUM
+
 
 def NEGCall(operation, body):
     return NEG_ADD_DEL_FORMAT.format(PROJECT, ZONE, NEG_NAME, operation, body)
 
+
 def attachNE(body):
     return NEG_ADD_DEL_FORMAT.format(PROJECT, ZONE, NEG_NAME, ATTACH, body)
 
+
 def detachNE(body):
     return NEG_ADD_DEL_FORMAT.format(PROJECT, ZONE, NEG_NAME, DETACH, body)
+
 
 class NetworkEndpoint:
     def __init__(self, instance, ipAddress, port):
@@ -81,7 +90,8 @@ def genBody(endpoints):
 negCalls = []
 
 if __name__ == "__main__":
-    print "START"
+    print
+    "START"
 
     endpointCount = 0
     endpointList = []
@@ -102,8 +112,10 @@ if __name__ == "__main__":
     if len(endpointList) > 0:
         negCalls.append(genBody(endpointList))
 
-    print "==========Number of calls=========:", len(negCalls)
-    print "==========Number of Endpoints=========:", endpointCount
+    print
+    "==========Number of calls=========:", len(negCalls)
+    print
+    "==========Number of Endpoints=========:", endpointCount
 
     t1 = datetime.now()
 
@@ -115,22 +127,27 @@ if __name__ == "__main__":
     combined1 = delta.seconds + delta.microseconds / 1E6
     while True:
         out = subprocess.check_output("gosso --url " + BM_URL, stderr=subprocess.STDOUT, shell=True)
-        #print out
+        # print out
         m = re.search(SEARCH, out)
-    #    print m.group(0)
+        #    print m.group(0)
 
         if m:
             found = m.group(1)
-            print "Healthy endpoint count:" + found
+            print
+            "Healthy endpoint count:" + found
             if int(found) == EXPECT_COUNT:
                 break
         else:
-            print "no match"
+            print
+            "no match"
 
     t3 = datetime.now()
     delta = t3 - t2
     combined2 = delta.seconds + delta.microseconds / 1E6
 
-    print "NEG API calls issued in: " + str(combined1)
-    print "Backend programmed in: " + str(combined2)
-    print "END"
+    print
+    "NEG API calls issued in: " + str(combined1)
+    print
+    "Backend programmed in: " + str(combined2)
+    print
+    "END"

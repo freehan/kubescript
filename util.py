@@ -1,8 +1,6 @@
-import subprocess
 import os
 import shutil
-import datetime
-from pprint import pprint
+import subprocess
 
 GET_ALL_RESOURCE = "kubectl get {} --all-namespaces -o wide"
 GET_CURRENT_CONTEXT = "kubectl config current-context"
@@ -16,6 +14,7 @@ KUBE_BASE_IMAGE = "gcr.io/google_containers/debian-iptables-amd64:v4"
 TMP_DOCKER_BUILD_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "build")
 DOCKERFILE = "Dockerfile"
 TMP_DOCKER_FILE_PATH = os.path.join(TMP_DOCKER_BUILD_PATH, DOCKERFILE)
+
 
 class Pod:
     def __init__(self):
@@ -78,14 +77,14 @@ def find_all_pods_with_prefix(pods, prefix):
 
 def run_kubectl(operation, resource, namespace, name, parameters):
     cmd = KUBECTL_RESOURCE_OPERATION.format(operation, resource, namespace, name, ' '.join(parameters))
-    print "+ " + cmd
-    print subprocess.check_output(cmd, shell=True)
+    print("+ " + cmd)
+    print(subprocess.check_output(cmd, shell=True))
 
 
 def exec_in_pod(pod, args):
     print("##### Exec in %s/%s" % (pod.namespace, pod.name))
     cmd = ["kubectl", "--namespace", pod.namespace, "exec"]
-    if len(args) <= 1 and ( args[0] == "bash" or args[0] == "sh"):
+    if len(args) <= 1 and (args[0] == "bash" or args[0] == "sh"):
         cmd.append("-it")
     else:
         cmd.append("-t")
@@ -139,8 +138,9 @@ def gcloud_compute_ssh_command(zone, host, cmd):
 def gcloud_compute_copy_file_to_host(host, file):
     exec_cmd(GCLOUD_COPY_FILE + [file, host + ":"])
 
+
 def exec_cmd(cmd):
-    print "+ " + ' '.join(cmd)
+    print("+ " + ' '.join(cmd))
     subprocess.call(cmd)
 
 
@@ -154,7 +154,7 @@ def get_cmd_result_as_table(cmd):
         output = "Failed to exec: " + cmd + "\n"
         output += "ErrorCode: " + str(exc.returncode) + "\n"
         output += "Output: " + exc.output + "\n"
-        print output
+        print(output)
         return [[output]]
 
     lines = output.splitlines()
@@ -207,7 +207,7 @@ def build_kube_image_tarball(tag, output_path="/tmp/out.tar"):
     f = open(output_path, 'w+')
     subprocess.call(["docker", "save", tag], stdout=f)
     f.close()
-    print "Saved %s image at %s" % (tag, output_path)
+    print("Saved %s image at %s" % (tag, output_path))
     # save tag
     f = open(output_path + ".tag", 'w+')
     f.write(tag)
@@ -226,7 +226,7 @@ def search_binary_in_k8s_output_path(binary):
     bin_path = os.path.join(gopath, 'src/k8s.io/kubernetes/_output/bin', binary)
     if not os.path.isfile(bin_path):
         raise LookupError("Cannot find %s binary in %s" % (binary, bin_path))
-    print "================Found %s Binary================" % binary
+    print("================Found %s Binary================" % binary)
     exec_cmd(["ls", "-al", bin_path])
     return bin_path
 

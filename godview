@@ -2,12 +2,14 @@
 # Usage
 # run godview and hit localhost:8000 in the browser
 
-from util import *
+import os
+import threading
+import time
+
 import SimpleHTTPServer
 import SocketServer
-import time
-import threading
-import os
+
+from util import *
 
 PORT = 8000
 TODOs = [
@@ -25,12 +27,12 @@ TODOs = [
 if 'RUN' in os.environ:
     TODOs = os.environ['RUN'] + TODOs
 
-
 template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "index.template")
 
 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 SocketServer.TCPServer.allow_reuse_address = True
 httpd = SocketServer.TCPServer(("", PORT), Handler)
+
 
 def update_page():
     now = time.ctime()
@@ -50,7 +52,9 @@ def update_page():
 
 try:
     update_page()
-    print "Serving at port", PORT
+    print
+    "Serving at port", PORT
     httpd.serve_forever()
 except KeyboardInterrupt:
-    print '\nGoodbye!'
+    print
+    '\nGoodbye!'

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import argparse
+
 from util import *
 
 parser = argparse.ArgumentParser(
@@ -24,11 +25,13 @@ prefix = args.prefix if args.prefix != None else ""
 matches = get_matched_objects(resource, prefix)
 
 if operation == 'get' and len(unknown_args) <= 0:
-    print '\n'.join(matches)
+    print
+    '\n'.join(matches)
     exit(0)
 
 if len(matches) <= 1 or prefix == "":
-    print 'no match found'
+    print
+    'no match found'
     exit(1)
 
 for obj in matches[1:]:

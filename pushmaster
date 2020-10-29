@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-from util import *
 import argparse
-import os
 import datetime
+
+from util import *
 
 BASE_IMAGE = "busybox"
 OUTPUT_PATH = "/tmp/my{}.tar"
@@ -26,7 +26,8 @@ bin_path = search_binary_in_k8s_output_path(binary)
 tarball_path = OUTPUT_PATH.format(binary)
 
 if args.build:
-    print "============= Build %s image tarball ================" % binary
+    print
+    "============= Build %s image tarball ================" % binary
     tag = "my" + binary + ":" + datetime.datetime.now().strftime("%Y%m%d%H%M")
     build_kube_image(BASE_IMAGE, bin_path, binary, tag=tag)
     build_kube_image_tarball(tag, output_path=tarball_path)
@@ -34,7 +35,8 @@ if args.build:
 else:
     tag = retrieve_image_tag(tarball_path)
 
-print "===================Pushing %s ===================" % binary
+print
+"===================Pushing %s ===================" % binary
 cmd = """sudo bash -c '
 docker load < my{}.tar
 ls -al ~/{}.manifest > /dev/null 2>&1 || cp /etc/kubernetes/manifests/{}.manifest /home/kubernetes/{}.manifest
