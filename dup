@@ -21,10 +21,13 @@ template = f.read()
 f.close()
 
 for i in range(args.replicas[0]):
-    print("==============Creating %d" % i)
+    opStr = "Creating"
+    if args.teardown:
+        opStr = "Deleting"
+    print("==============%s %d" % (opStr, i))
     if args.interval[0] > 0:
         time.sleep(float(args.interval[0]))
-    tmpfile = filename+".tmp"
+    tmpfile = filename + ".tmp"
     f = open(tmpfile, "w")
     f.write(template.replace("{}", str(i)))
     f.close()
@@ -39,7 +42,3 @@ for i in range(args.replicas[0]):
     finally:
         print(output)
     os.remove(tmpfile)
-
-
-
-

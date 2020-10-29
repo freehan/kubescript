@@ -3,3 +3,4 @@ hub
 index.html
 .idea*
 *.pyc
+.DS_Store
