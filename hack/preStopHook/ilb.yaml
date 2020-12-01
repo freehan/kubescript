@@ -1,0 +1,62 @@
+---
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: internal-lb-app
+  name: internal-lb-app
+spec:
+  selector:
+    matchLabels:
+      run: internal-lb-app
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        run: internal-lb-app
+    spec:
+      containers:
+      - image: gcr.io/google_containers/serve-hostname-amd64:1.5 
+        name: internal-lb-app
+        ports:
+        - containerPort: 9376
+          protocol: TCP
+        # It is okay to left out the preStop hook config here because the container image handles SIGTERM gracefully.
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; keep serving traffic instead instead
+              command: ["sleep","60"]
+---
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-lb-svc
+  namespace: default
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' # This is required
+spec:
+  ports:
+  - name: host1
+    port: 80
+    protocol: TCP
+    targetPort: 9376
+  selector:
+    run: internal-lb-app
+  type: ClusterIP
+---
+ 
+# ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ilb-demo-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "gce-internal" # This is the only part that's different from a traditional GKE ingress
+spec:
+  backend:
+    serviceName: internal-lb-svc
+    servicePort: 80
