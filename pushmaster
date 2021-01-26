@@ -32,7 +32,7 @@ if args.build:
     tag = "my" + binary + ":" + datetime.datetime.now().strftime("%Y%m%d%H%M")
     build_kube_image(BASE_IMAGE, bin_path, binary, tag=tag)
     build_kube_image_tarball(tag, output_path=tarball_path)
-    # docker_rmi(tag)
+    docker_rmi(tag)
 else:
     tag = retrieve_image_tag(tarball_path)
 

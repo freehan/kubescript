@@ -196,7 +196,7 @@ def build_kube_image(baseimage, binary_path, binary_name, tag="mykubetag"):
     # f.write("FROM " + baseimage + "\n")
     f.write("COPY " + binary_name + " /usr/local/bin/" + binary_name + "\n")
     f.close()
-    exec_cmd(["docker", "build", "-t", tag, TMP_DOCKER_BUILD_PATH])
+    exec_cmd(["docker", "build", "--pull", "-q", "-t", tag, TMP_DOCKER_BUILD_PATH])
     shutil.rmtree(TMP_DOCKER_BUILD_PATH)
 
 
@@ -222,11 +222,13 @@ def retrieve_image_tag(output_path):
     return tag
 
 
+mac_build_command = "KUBE_BUILD_PLATFORMS=linux/amd64 make all WHAT=${binary}"
+
 def search_binary_in_k8s_output_path(binary):
     gopath = os.environ['GOPATH']
-    bin_path = os.path.join(gopath, 'src/k8s.io/kubernetes/_output/bin', binary)
+    bin_path = os.path.join(gopath, 'src/k8s.io/kubernetes/_output/local/bin/linux/amd64', binary)
     if not os.path.isfile(bin_path):
-        raise LookupError("Cannot find %s binary in %s" % (binary, bin_path))
+        raise LookupError("Cannot find %s binary in %s. If on mac, please build the binary with the following command:\n %s" % (binary, bin_path, mac_build_command))
     print("================Found %s Binary================" % binary)
     exec_cmd(["ls", "-al", bin_path])
     return bin_path
