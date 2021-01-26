@@ -5,7 +5,8 @@ import datetime
 
 from util import *
 
-BASE_IMAGE = "busybox"
+# BASE_IMAGE = "busybox"
+BASE_IMAGE = "k8s.gcr.io/build-image/go-runner:buster-v2.2.2"
 OUTPUT_PATH = "/tmp/my{}.tar"
 COMPONENTS = ["kube-apiserver", "kube-controller-manager", "kube-scheduler"]
 
@@ -31,16 +32,18 @@ if args.build:
     tag = "my" + binary + ":" + datetime.datetime.now().strftime("%Y%m%d%H%M")
     build_kube_image(BASE_IMAGE, bin_path, binary, tag=tag)
     build_kube_image_tarball(tag, output_path=tarball_path)
-    docker_rmi(tag)
+    # docker_rmi(tag)
 else:
     tag = retrieve_image_tag(tarball_path)
 
 print
 "===================Pushing %s ===================" % binary
+# docker node uses this to load image
+# docker load < my{}.tar
 cmd = """sudo bash -c '
-docker load < my{}.tar
+ctr -n=k8s.io images import my{}.tar
 ls -al ~/{}.manifest > /dev/null 2>&1 || cp /etc/kubernetes/manifests/{}.manifest /home/kubernetes/{}.manifest
-sed -i "s/\\"image\\":.*/\\"image\\": \\"{}\\",/" /etc/kubernetes/manifests/{}.manifest
+sed -i "s/\\"image\\":.*/\\"image\\": \\"docker.io\\/library\\/{}\\",/" /etc/kubernetes/manifests/{}.manifest
 '
 """
 cmd = cmd.format(binary, binary, binary, binary, tag, binary)

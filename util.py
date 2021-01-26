@@ -192,8 +192,9 @@ def build_kube_image(baseimage, binary_path, binary_name, tag="mykubetag"):
     exec_cmd(["ln", binary_path, simlink_path])
 
     f = open(TMP_DOCKER_FILE_PATH, 'w+')
-    f.write("FROM " + baseimage + "\n")
-    f.write("ADD " + binary_name + " /usr/local/bin/" + binary_name + "\n")
+    f.write("FROM " + "--platform=linux/amd64 " + baseimage + "\n")
+    # f.write("FROM " + baseimage + "\n")
+    f.write("COPY " + binary_name + " /usr/local/bin/" + binary_name + "\n")
     f.close()
     exec_cmd(["docker", "build", "-t", tag, TMP_DOCKER_BUILD_PATH])
     shutil.rmtree(TMP_DOCKER_BUILD_PATH)
