@@ -12,7 +12,7 @@ spec:
       - path: /foo
         backend:
           serviceName: foo-backend-neg
-          servicePort: 80
+          servicePort: http
       - path: /bar
         backend:
           serviceName: bar-backend-neg

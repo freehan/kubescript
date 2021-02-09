@@ -1,0 +1,46 @@
+---
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: lb-app
+  name: lb-app
+spec:
+  selector:
+    matchLabels:
+      run: lb-app
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        run: lb-app
+    spec:
+      containers:
+      - image: gcr.io/google_containers/serve-hostname-amd64:1.5 
+        name: lb-app
+        ports:
+        - containerPort: 9376
+          protocol: TCP
+        # It is okay to left out the preStop hook config here because the container image handles SIGTERM gracefully.
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; keep serving traffic instead instead
+              command: ["sleep","60"]
+---
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-svc
+  namespace: default
+spec:
+  ports:
+  - name: host1
+    port: 80
+    protocol: TCP
+    targetPort: 9376
+  selector:
+    run: lb-app
+  type: LoadBalancer
