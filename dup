@@ -30,7 +30,7 @@ for i in range(args.replicas[0]):
     #     time.sleep(float(args.interval[0]))
     tmpfile = filename + ".tmp"
     f = open(tmpfile, "w")
-    f.write(template.replace("{}", str(i)))
+    f.write(template.replace("{$}", str(i)))
     f.close()
     output = ""
     try:

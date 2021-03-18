@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hostnamesvc-{}
+  name: hostnamesvc-{$}
   labels:
-    run: hostname-{}
+    run: hostname-{$}
 spec:
   type: LoadBalancer
   ports:
@@ -11,23 +11,23 @@ spec:
     port: 80
     targetPort: 9376
   selector:
-    run: hostname-{}
+    run: hostname-{$}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: hostname-{}
-  name: hostname-{}
+    run: hostname-{$}
+  name: hostname-{$}
 spec:
   selector:
     matchLabels:
-      run: hostname-{}
+      run: hostname-{$}
   replicas: 2
   template:
     metadata:
       labels:
-        run: hostname-{}
+        run: hostname-{$}
     spec:
       containers:
       - image: gcr.io/google_containers/serve-hostname-amd64:1.5

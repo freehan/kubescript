@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: hostname
+  name: hostname
+spec:
+  selector:
+    matchLabels:
+      run: hostname
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        run: hostname
+    spec:
+      containers:
+      - image: gcr.io/google_containers/serve-hostname-amd64:1.5
+        imagePullPolicy: IfNotPresent
+        name: hostname
+        ports:
+        - containerPort: 9376
+
