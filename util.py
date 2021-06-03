@@ -46,7 +46,7 @@ class GCEInstance:
 
 
 def get_all_resource(resource):
-    return subprocess.check_output(GET_ALL_RESOURCE.format(resource), shell=True)
+    return subprocess.check_output(GET_ALL_RESOURCE.format(resource), shell=True, universal_newlines=True)
 
 
 def get_matched_objects(resource, prefix):
@@ -78,7 +78,7 @@ def find_all_pods_with_prefix(pods, prefix):
 def run_kubectl(operation, resource, namespace, name, parameters):
     cmd = KUBECTL_RESOURCE_OPERATION.format(operation, resource, namespace, name, ' '.join(parameters))
     print("+ " + cmd)
-    print(subprocess.check_output(cmd, shell=True))
+    print(subprocess.check_output(cmd, shell=True, universal_newlines=True))
 
 
 def exec_in_pod(pod, args):
@@ -98,11 +98,11 @@ def exec_in_pod(pod, args):
 
 
 def get_kube_context():
-    return subprocess.check_output(GET_CURRENT_CONTEXT, shell=True)
+    return subprocess.check_output(GET_CURRENT_CONTEXT, shell=True, universal_newlines=True)
 
 
 def get_all_gce_instances():
-    output = subprocess.check_output(GET_ALL_GCE_INSTANCES, shell=True)
+    output = subprocess.check_output(GET_ALL_GCE_INSTANCES, shell=True, universal_newlines=True)
     instances = []
     i = 0
     lines = output.splitlines()
@@ -149,7 +149,7 @@ def get_cmd_result_as_table(cmd):
     table = []
     output = ""
     try:
-        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
     except subprocess.CalledProcessError as exc:
         output = "Failed to exec: " + cmd + "\n"
         output += "ErrorCode: " + str(exc.returncode) + "\n"
