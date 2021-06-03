@@ -1,0 +1,481 @@
+---
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: lb-app
+  name: lb-app
+spec:
+  selector:
+    matchLabels:
+      run: lb-app
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        run: lb-app
+    spec:
+      containers:
+      - image: gcr.io/google_containers/serve-hostname-amd64:1.5 
+        name: lb-app
+        ports:
+        - containerPort: 9376
+          protocol: TCP
+        # It is okay to left out the preStop hook config here because the container image handles SIGTERM gracefully.
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; keep serving traffic instead instead
+              command: ["sleep","60"]
+---
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-svc
+  namespace: default
+spec:
+  selector:
+    run: lb-app
+  type: LoadBalancer
+  ports:
+  - name: port1
+    port: 81
+    protocol: TCP
+    targetPort: 9376
+  - name: port2
+    port: 82
+    protocol: TCP
+    targetPort: 9376
+  - name: port3
+    port: 83
+    protocol: TCP
+    targetPort: 9376
+  - name: port4
+    port: 84
+    protocol: TCP
+    targetPort: 9376
+  - name: port5
+    port: 85
+    protocol: TCP
+    targetPort: 9376
+  - name: port6
+    port: 86
+    protocol: TCP
+    targetPort: 9376
+  - name: port7
+    port: 87
+    protocol: TCP
+    targetPort: 9376
+  - name: port8
+    port: 88
+    protocol: TCP
+    targetPort: 9376
+  - name: port9
+    port: 89
+    protocol: TCP
+    targetPort: 9376
+  - name: port0
+    port: 90
+    protocol: TCP
+    targetPort: 9376
+  - name: port11
+    port: 91
+    protocol: TCP
+    targetPort: 9376
+  - name: port12
+    port: 92
+    protocol: TCP
+    targetPort: 9376
+  - name: port13
+    port: 93
+    protocol: TCP
+    targetPort: 9376
+  - name: port14
+    port: 94
+    protocol: TCP
+    targetPort: 9376
+  - name: port15
+    port: 95
+    protocol: TCP
+    targetPort: 9376
+  - name: port16
+    port: 96
+    protocol: TCP
+    targetPort: 9376
+  - name: port17
+    port: 97
+    protocol: TCP
+    targetPort: 9376
+  - name: port18
+    port: 98
+    protocol: TCP
+    targetPort: 9376
+  - name: port19
+    port: 99
+    protocol: TCP
+    targetPort: 9376
+  - name: port20
+    port: 100
+    protocol: TCP
+    targetPort: 9376
+  - name: port21
+    port: 101
+    protocol: TCP
+    targetPort: 9376
+  - name: port22
+    port: 102
+    protocol: TCP
+    targetPort: 9376
+  - name: port23
+    port: 103
+    protocol: TCP
+    targetPort: 9376
+  - name: port24
+    port: 104
+    protocol: TCP
+    targetPort: 9376
+  - name: port25
+    port: 105
+    protocol: TCP
+    targetPort: 9376
+  - name: port26
+    port: 106
+    protocol: TCP
+    targetPort: 9376
+  - name: port27
+    port: 107
+    protocol: TCP
+    targetPort: 9376
+  - name: port28
+    port: 108
+    protocol: TCP
+    targetPort: 9376
+  - name: port29
+    port: 109
+    protocol: TCP
+    targetPort: 9376
+  - name: port30
+    port: 110
+    protocol: TCP
+    targetPort: 9376
+  - name: port31
+    port: 111
+    protocol: TCP
+    targetPort: 9376
+  - name: port32
+    port: 112
+    protocol: TCP
+    targetPort: 9376
+  - name: port33
+    port: 113
+    protocol: TCP
+    targetPort: 9376
+  - name: port34
+    port: 114
+    protocol: TCP
+    targetPort: 9376
+  - name: port35
+    port: 115
+    protocol: TCP
+    targetPort: 9376
+  - name: port36
+    port: 116
+    protocol: TCP
+    targetPort: 9376
+  - name: port37
+    port: 117
+    protocol: TCP
+    targetPort: 9376
+  - name: port38
+    port: 118
+    protocol: TCP
+    targetPort: 9376
+  - name: port39
+    port: 119
+    protocol: TCP
+    targetPort: 9376
+  - name: port40
+    port: 130
+    protocol: TCP
+    targetPort: 9376
+  - name: port41
+    port: 131
+    protocol: TCP
+    targetPort: 9376
+  - name: port42
+    port: 132
+    protocol: TCP
+    targetPort: 9376
+  - name: port43
+    port: 133
+    protocol: TCP
+    targetPort: 9376
+  - name: port44
+    port: 134
+    protocol: TCP
+    targetPort: 9376
+  - name: port45
+    port: 135
+    protocol: TCP
+    targetPort: 9376
+  - name: port46
+    port: 136
+    protocol: TCP
+    targetPort: 9376
+  - name: port47
+    port: 137
+    protocol: TCP
+    targetPort: 9376
+  - name: port48
+    port: 138
+    protocol: TCP
+    targetPort: 9376
+  - name: port49
+    port: 139
+    protocol: TCP
+    targetPort: 9376
+  - name: port50
+    port: 140
+    protocol: TCP
+    targetPort: 9376
+  - name: port51
+    port: 141
+    protocol: TCP
+    targetPort: 9376
+  - name: port52
+    port: 142
+    protocol: TCP
+    targetPort: 9376
+  - name: port53
+    port: 143
+    protocol: TCP
+    targetPort: 9376
+  - name: port54
+    port: 144
+    protocol: TCP
+    targetPort: 9376
+  - name: port55
+    port: 145
+    protocol: TCP
+    targetPort: 9376
+  - name: port56
+    port: 146
+    protocol: TCP
+    targetPort: 9376
+  - name: port57
+    port: 147
+    protocol: TCP
+    targetPort: 9376
+  - name: port58
+    port: 148
+    protocol: TCP
+    targetPort: 9376
+  - name: port59
+    port: 149
+    protocol: TCP
+    targetPort: 9376
+  - name: port60
+    port: 150
+    protocol: TCP
+    targetPort: 9376
+  - name: port61
+    port: 151
+    protocol: TCP
+    targetPort: 9376
+  - name: port62
+    port: 152
+    protocol: TCP
+    targetPort: 9376
+  - name: port63
+    port: 153
+    protocol: TCP
+    targetPort: 9376
+  - name: port64
+    port: 154
+    protocol: TCP
+    targetPort: 9376
+  - name: port65
+    port: 155
+    protocol: TCP
+    targetPort: 9376
+  - name: port66
+    port: 156
+    protocol: TCP
+    targetPort: 9376
+  - name: port67
+    port: 157
+    protocol: TCP
+    targetPort: 9376
+  - name: port68
+    port: 158
+    protocol: TCP
+    targetPort: 9376
+  - name: port69
+    port: 159
+    protocol: TCP
+    targetPort: 9376
+  - name: port70
+    port: 160
+    protocol: TCP
+    targetPort: 9376
+  - name: port71
+    port: 161
+    protocol: TCP
+    targetPort: 9376
+  - name: port72
+    port: 162
+    protocol: TCP
+    targetPort: 9376
+  - name: port73
+    port: 163
+    protocol: TCP
+    targetPort: 9376
+  - name: port74
+    port: 164
+    protocol: TCP
+    targetPort: 9376
+  - name: port75
+    port: 165
+    protocol: TCP
+    targetPort: 9376
+  - name: port76
+    port: 166
+    protocol: TCP
+    targetPort: 9376
+  - name: port77
+    port: 167
+    protocol: TCP
+    targetPort: 9376
+  - name: port78
+    port: 168
+    protocol: TCP
+    targetPort: 9376
+  - name: port79
+    port: 169
+    protocol: TCP
+    targetPort: 9376
+  - name: port80
+    port: 170
+    protocol: TCP
+    targetPort: 9376
+  - name: port81
+    port: 171
+    protocol: TCP
+    targetPort: 9376
+  - name: port82
+    port: 172
+    protocol: TCP
+    targetPort: 9376
+  - name: port83
+    port: 173
+    protocol: TCP
+    targetPort: 9376
+  - name: port84
+    port: 174
+    protocol: TCP
+    targetPort: 9376
+  - name: port85
+    port: 175
+    protocol: TCP
+    targetPort: 9376
+  - name: port86
+    port: 176
+    protocol: TCP
+    targetPort: 9376
+  - name: port87
+    port: 177
+    protocol: TCP
+    targetPort: 9376
+  - name: port88
+    port: 178
+    protocol: TCP
+    targetPort: 9376
+  - name: port89
+    port: 179
+    protocol: TCP
+    targetPort: 9376
+  - name: port90
+    port: 180
+    protocol: TCP
+    targetPort: 9376
+  - name: port91
+    port: 181
+    protocol: TCP
+    targetPort: 9376
+  - name: port92
+    port: 182
+    protocol: TCP
+    targetPort: 9376
+  - name: port93
+    port: 183
+    protocol: TCP
+    targetPort: 9376
+  - name: port94
+    port: 184
+    protocol: TCP
+    targetPort: 9376
+  - name: port95
+    port: 185
+    protocol: TCP
+    targetPort: 9376
+  - name: port96
+    port: 186
+    protocol: TCP
+    targetPort: 9376
+  - name: port97
+    port: 187
+    protocol: TCP
+    targetPort: 9376
+  - name: port98
+    port: 188
+    protocol: TCP
+    targetPort: 9376
+  - name: port99
+    port: 189
+    protocol: TCP
+    targetPort: 9376
+  - name: port100
+    port: 190
+    protocol: TCP
+    targetPort: 9376
+  - name: port101
+    port: 191
+    protocol: TCP
+    targetPort: 9376
+  - name: port102
+    port: 192
+    protocol: TCP
+    targetPort: 9376
+  - name: port103
+    port: 193
+    protocol: TCP
+    targetPort: 9376
+  - name: port104
+    port: 194
+    protocol: TCP
+    targetPort: 9376
+  - name: port105
+    port: 295
+    protocol: TCP
+    targetPort: 9376
+  - name: port106
+    port: 296
+    protocol: TCP
+    targetPort: 9376
+  - name: port107
+    port: 197
+    protocol: TCP
+    targetPort: 9376
+  - name: port108
+    port: 298
+    protocol: TCP
+    targetPort: 9376
+  - name: port109
+    port: 299
+    protocol: TCP
+    targetPort: 9376
+ 
+ 
+ 

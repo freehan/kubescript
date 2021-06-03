@@ -1,10 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: debug
   labels:
      name: debug
 spec:
+  selector: 
+    matchLabels:
+      app: debug
   template:
     metadata:
       name: debug-pod
