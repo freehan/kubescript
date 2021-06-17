@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: hostname-{}
-  name: hostname-{}
-  annotations: 
-    version: '1' 
+    run: hostname-{$}
+  name: hostname-{$}
 spec:
   selector:
     matchLabels:
-      run: hostname-{}
+      run: hostname-{$}
   replicas: 2
   template:
     metadata:
       labels:
-        run: hostname-{}
+        run: hostname-{$}
+      annotations:
+        version: '1'
     spec:
       containers:
       - image: gcr.io/google_containers/serve-hostname-amd64:1.5
