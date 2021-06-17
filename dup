@@ -37,7 +37,7 @@ for i in range(args.replicas[0]):
         if args.teardown:
             output = subprocess.check_output(KUBECTL_DELETE + tmpfile, stderr=subprocess.STDOUT, shell=True)
         else:
-            output = subprocess.check_output(KUBECTL_CREATE + tmpfile, stderr=subprocess.STDOUT, shell=True)
+            output = subprocess.check_output(KUBECTL_APPLY + tmpfile, stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError as err:
         print("Failed" + err.output)
     finally:
