@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: foo-backend
+  name: foo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: foo-backend
+  template:
+    metadata:
+      labels:
+        run: foo-backend
+    spec:
+      containers:
+      - image: gcr.io/google_containers/serve-hostname-amd64:1.5
+        imagePullPolicy: IfNotPresent
+        name: hostname
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+           path: /readiness
+           port: 9376
+           scheme: HTTP
+        ports:
+        - containerPort: 9376
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foo-backend
+  namespace: default
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 9376
+  selector:
+    run: foo-backend
+  sessionAffinity: None
+  type: ClusterIP
