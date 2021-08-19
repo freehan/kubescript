@@ -1,0 +1,142 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: namedport
+spec:
+  backend:
+    # Re-use echoheadersx as the default backend so we stay under the default
+    # quota for gce BackendServices.
+    serviceName: namedport
+    servicePort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: namedport
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' 
+  labels:
+    app: namedport
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: "myport1"
+    protocol: TCP
+    name: myport1
+  - port: 8081
+    targetPort: "myport2"
+    protocol: TCP
+    name: myport2
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: randomport
+  selector:
+    run: busybox
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox0
+  labels:
+    run: busybox
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busyboxcontainer
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox1
+  labels:
+    run: busybox
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busyboxcontainer
+    ports:
+    - name: myport1
+      containerPort: 80
+    - name: myport2
+      containerPort: 81
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox2
+  labels:
+    run: busybox
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busyboxcontainer
+    ports:
+    - name: myport1
+      containerPort: 81
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox3
+  labels:
+    run: busybox
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busyboxcontainer
+    ports:
+    - name: myport1
+      containerPort: 8888
+    - name: unused
+      containerPort: 8080
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox4
+  labels:
+    run: busybox
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busyboxcontainer
+    ports:
+    - name: myport1
+      containerPort: 80
+    - name: myport2
+      containerPort: 81
+    - name: unused
+      containerPort: 8080
+  restartPolicy: Always
