@@ -24,11 +24,11 @@ spec:
   - port: 8080
     targetPort: "myport1"
     protocol: TCP
-    name: myport1
+    name: svc-myport1
   - port: 8081
     targetPort: "myport2"
     protocol: TCP
-    name: myport2
+    name: svc-myport2
   - port: 80
     targetPort: 8080
     protocol: TCP
