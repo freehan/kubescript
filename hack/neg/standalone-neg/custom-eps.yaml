@@ -1,0 +1,22 @@
+apiVersion: discovery.k8s.io/v1beta1
+kind: EndpointSlice
+metadata:
+  labels:
+    kubernetes.io/service-name: foo-backend
+  name: foo-backend-custom
+addressType: IPv4
+endpoints:
+  - addresses: ["10.72.0.6"]
+    conditions:
+      ready: true
+    nodeName: gke-test-cluster-default-pool-47a57d2b-b5kj
+    targetRef:
+      kind: Pod
+      name: foo-backend1-d489556f9-rw96f
+      namespace: default
+      resourceVersion: "7543870"
+      uid: c23d1834-79e8-49a2-8292-89a3d118f373
+ports:
+  - name: ""
+    port: 9376
+    protocol: TCP

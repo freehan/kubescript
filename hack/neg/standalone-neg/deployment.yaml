@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: foo-backend1
+  name: foo-backend1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: foo-backend1
+  template:
+    metadata:
+      labels:
+        run: foo-backend1
+    spec:
+      containers:
+      - image: gcr.io/google_containers/serve-hostname-amd64:1.5
+        imagePullPolicy: IfNotPresent
+        name: hostname
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+           path: /readiness
+           port: 9376
+           scheme: HTTP
+        ports:
+        - containerPort: 9376

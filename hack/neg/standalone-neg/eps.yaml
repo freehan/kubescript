@@ -1,0 +1,35 @@
+apiVersion: discovery.k8s.io/v1beta1
+kind: EndpointSlice
+metadata:
+  labels:
+    kubernetes.io/service-name: foo-backend
+    endpointslice.kubernetes.io/managed-by: ndpointslice-controller.k8s.io
+  name: foo-backend-custom
+addressType: IPv4
+endpoints:
+  - addresses: ["10.44.41.12"]
+    conditions:
+      ready: true
+    topology:
+      kubernetes.io/hostname: "gke-neg-repro-default-pool-7578126d-7xx9"
+    targetRef:
+      kind: Pod
+      name: foo-backend-7cc8fc5f5b-9fzjf-bogus
+      namespace: default
+      resourceVersion: "22029"
+      uid: effdcb48-43ce-464d-8cfb-adba5359c87a
+  - addresses: ["10.44.41.12"]
+    conditions:
+      ready: false
+    topology:
+      kubernetes.io/hostname: "gke-neg-repro-default-pool-7578126d-bogus"
+    targetRef:
+      kind: Pod
+      name: foo-backend-7cc8fc5f5b-9fzjf-bogus
+      namespace: default
+      resourceVersion: "22029"
+      uid: effdcb48-43ce-464d-8cfb-adba5359c87a
+ports:
+  - name: ""
+    port: 9376
+    protocol: TCP

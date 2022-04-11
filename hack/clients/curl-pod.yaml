@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: curl-pod
+  name: curl-pod
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: curl-pod
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: curl-pod
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - sleep 30000
+        image: curlimages/curl:7.79.1
+        imagePullPolicy: Always
+        name: curl-pod
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,13 @@
+apiVersion: discovery.k8s.io/v1beta1
+kind: EndpointSlice
+metadata:
+  labels:
+    kubernetes.io/service-name: foo-backend
+    endpointslice.kubernetes.io/managed-by: ndpointslice-controller.k8s.io
+  name: problem-eps1
+addressType: IPv4
+endpoints:
+  - addresses: ["10.44.41.12"]
+    topology: 
+      kubernetes.io/hostname: 'node3'
+  - addresses: ["10.44.41.12"]
